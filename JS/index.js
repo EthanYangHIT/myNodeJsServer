@@ -1,8 +1,8 @@
 /**
  * Created by yangyusenhit on 2016/3/1.
  */
-var server  = require("./server");
-var router = require("./router");
-var actionServer = require("./actionServer");
+var server = require("./server");  //服务
+var router = require("./router");  //路由
+var port = 8888; //端口
 
-server.start(router,actionServer);
+server.start(router, port);

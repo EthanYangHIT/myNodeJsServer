@@ -1,49 +1,25 @@
 /**
  * Created by yangyusenhit on 2016/3/1.
  */
-
-var childProcess = require("child_process");
-
-exports.hello = function (res) {
-    var n = childProcess.fork(__dirname + "/subProcess.js");
-    n.on('message', function () {
-        res.writeHead(200, {"Content-Type": "text/plain"});
-        res.write("say hello.");
-        res.end();
-    });
-    n.send({});
+var actionServer = require("./actionServer");
+//路由表
+var actionIndex = {
+    "login": actionServer.login,
+    "CSS": actionServer.css
 };
-
-exports.upload = function (res) {
-    res.writeHead(200, {"Content-Type": "text/plain"});
-    res.write("upload");
-    res.end();
-};
-
-function sleep(milliSecond) {
-    var startTime = new Date().getTime();
-    console.log(startTime);
-    while (new Date().getTime() <= milliSecond + startTime) {
+//寻路
+function findPath(root, path, index) {
+    if (typeof root[path[index]] === 'function') {
+        return root[path[index]];
+    } else if (typeof root[path[index]] === 'object') {
+        findPath(root[path[index]], path, index + 1);
+    } else {
+        return actionServer.notFound;
     }
-    console.log(new Date().getTime());
 }
-process.on('message', function () {
-    sleep(20000);
-    process.send({});
-});
-
-function handle(actionServer, pathname, req, res) {
-    //路由表
-    var actionIndex = {
-        "/login": actionServer.login,
-        "/upload": actionServer.upload,
-        "/download": actionServer.download
-    };
-
-    if (typeof actionIndex[pathname] === 'function')
-        return actionIndex[pathname](req, res);
-    else
-        return actionServer.notFound(req, res);
+function handle(pathname, res) {
+    var path = pathname.split("/");
+    findPath(actionIndex, path, 1)(pathname, res);
 }
 
 exports.handle = handle;

@@ -4,12 +4,11 @@
 var http = require("http");
 var url = require("url");
 
-function start(router,actionServer) {
+function start(router, port) {
     http.createServer(function (request, response) {
-        var pathname = url.parse(request.url).pathname;
-        console.log("request path: " + pathname);
-        router.handle(actionServer,pathname,request,response);
-    }).listen(8888);
+        var path = url.parse(request.url).pathname;
+        router.handle(path, response);
+    }).listen(port);
     console.log('server is ready...')
 }
 

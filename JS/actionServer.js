@@ -1,31 +1,37 @@
 /**
  * Created by yangyusenhit on 2016/3/1.
  */
-function login(req, res) {
-    console.log("login...");
-    var startTime = new Date().getTime();
-    while (new Date().getTime() < startTime + 10000);
-    console.log(req.method);
-    res.writeHead(200, {"Content-Type": "text/plain"});
-    res.write("login");
-    res.end();
+var fs = require("fs");
+var mime = require("mime");
+var url = require("url");
+
+function css(path, res) {
+    var filePath = '..' + path;
+    fs.readFile(filePath, function (err, data) {
+        if (!err) {
+            res.writeHead(200, {"Content-Type": "text/css"});
+            res.end(data);
+        }
+    });
 }
-function upload(req, res) {
-    console.log("uploading...");
-    console.log(req.method);
-    res.writeHead(200, {"Content-Type": "text/plain"});
-    res.write("upload");
-    res.end();
+function notFound(path, res) {  //404 页面
+    fs.readFile('../HTML/404.html', function (err, data) {
+        res.writeHead(200, {"Content-Type": "text/html"});
+        res.end(data);
+    });
 }
-function download(req, res) {
-    console.log("downloading...");
+function login(path, res) {
+    var filePath = '../HTML' + path;
+    fs.readFile(filePath, function (err, data) {
+        if (!err) {
+            res.writeHead(200, {"Content-Type": mime.lookup(filePath)});
+            res.end(data);
+        } else {
+            notFound(path, res);
+        }
+    });
 }
-function notFound(req, res) {
-    res.writeHead(404, {"Content-Type": "text/plain"});
-    res.write("404 Not Found");
-    res.end();
-}
+
+exports.css = css;
 exports.login = login;
-exports.upload = upload;
-exports.download = download;
 exports.notFound = notFound;
